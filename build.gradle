@@ -1,10 +1,13 @@
 apply plugin: 'java'
 apply plugin: 'maven'
-apply plugin: 'signing'
 apply plugin: 'eclipse'
 
-group = 'com.fiftyonred'
-version = '0.4.0'
+project.ext {
+    jedis_version = "2.7"
+}
+
+group = 'com.centricient'
+version = jedis_version
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
@@ -14,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    compile 'redis.clients:jedis:2.6.0'
+    compile 'redis.clients:jedis:' + jedis_version + "+"
     testCompile 'junit:junit:4.11'
 }
 
@@ -38,46 +41,21 @@ artifacts {
     archives sourcesJar
 }
 
-signing {
-    sign configurations.archives
-}
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-              authentication(userName: sonatypeUsername, password: sonatypePassword)
+//noinspection GroovyMissingReturnStatement
+if (rootProject.properties['nexusUser']) {
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "http://nexus.centricient.corp:8081/nexus/content/repositories/releases/") {
+                    authentication(userName: nexusUser, password: nexusPassword)
+                }
+                pom.version = version
+                pom.artifactId = rootProject.name
             }
-
-            pom.project {
-               name 'mock-jedis'
-               packaging 'jar'
-               description 'Mock Jedis is a library for mocking out Jedis clients'
-               url 'https://github.com/50onRed/mock-jedis'
-
-               scm {
-                   url 'scm:git@github.com:50onRed/mock-jedis.git'
-                   connection 'scm:git@github.com:50onRed/mock-jedis.git'
-                   developerConnection 'scm:git@github.com:50onRed/mock-jedis.git'
-               }
-
-               licenses {
-                   license {
-                       name 'MIT'
-                       url 'https://raw.github.com/50onRed/mock-jedis/master/LICENSE'
-                       distribution 'repo'
-                   }
-               }
-
-               developers {
-                   developer {
-                       id 'idyedov'
-                       name 'Ivan Dyedov'
-                   }
-               }
-           }
         }
     }
+}
+
+task projectVersion << {
+    println version
 }

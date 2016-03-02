@@ -1624,11 +1624,6 @@ public class MockJedis extends Jedis {
 	}
 
 	@Override
-	protected void checkIsInMulti() {
-		super.checkIsInMulti();
-	}
-
-	@Override
 	public void resetState() {
 		super.resetState();
 	}
