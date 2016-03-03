@@ -830,6 +830,20 @@ public class MockTransaction extends Transaction {
     }
 
     @Override
+    public Response<Long> rpush(final String key, final String... strings) {
+        Response resp = pipeline.rpush(key, strings);
+        responses.add(resp);
+        return resp;
+    }
+
+    @Override
+    public Response<Long> rpush(final byte[] key, final byte[]... strings) {
+        Response resp = pipeline.rpush(key, strings);
+        responses.add(resp);
+        return resp;
+    }
+
+    @Override
     public Response<Long> sadd(final String key, final String... members) {
         Response resp = pipeline.sadd(key, members);
         responses.add(resp);
@@ -1035,6 +1049,20 @@ public class MockTransaction extends Transaction {
     @Override
     public Response<byte[]> lpop(final byte[] key) {
         Response resp = pipeline.lpop(key);
+        responses.add(resp);
+        return resp;
+    }
+
+    @Override
+    public Response<String> rpop(final String key) {
+        Response resp = pipeline.rpop(key);
+        responses.add(resp);
+        return resp;
+    }
+
+    @Override
+    public Response<byte[]> rpop(final byte[] key) {
+        Response resp = pipeline.rpop(key);
         responses.add(resp);
         return resp;
     }
