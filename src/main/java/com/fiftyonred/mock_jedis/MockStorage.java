@@ -545,7 +545,7 @@ public class MockStorage {
 		return hash == null ? 0 : hash.size();
 	}
 
-	public synchronized int lpush(final DataContainer key, final DataContainer... string) {
+	public synchronized int rpush(final DataContainer key, final DataContainer... string) {
 		List<DataContainer> list = getListFromStorage(key, true);
 		if (list == null) {
 			list = new ArrayList<DataContainer>();
@@ -555,7 +555,7 @@ public class MockStorage {
 		return list.size();
 	}
 
-    public synchronized int rpush(final DataContainer key, final DataContainer... string) {
+	public synchronized int lpush(final DataContainer key, final DataContainer... string) {
         List<DataContainer> list = getListFromStorage(key, true);
         if (list == null) {
             list = new ArrayList<DataContainer>();
@@ -563,7 +563,7 @@ public class MockStorage {
         }
 
         List<DataContainer> elems = Arrays.asList(string);
-        for (int i = elems.size() -1; i > -1; i--) {
+        for (int i = 0; i < elems.size(); i++) {
             DataContainer elem =  elems.get(i);
             list.add(0, elem);
         }
@@ -571,12 +571,12 @@ public class MockStorage {
         return list.size();
     }
 
-	public synchronized DataContainer lpop(final DataContainer key) {
+	public synchronized DataContainer rpop(final DataContainer key) {
 		final List<DataContainer> list = getListFromStorage(key, true);
 		return list == null || list.isEmpty() ? null : list.remove(list.size() - 1);
 	}
 
-    public synchronized DataContainer rpop(final DataContainer key) {
+	public synchronized DataContainer lpop(final DataContainer key) {
         final List<DataContainer> list = getListFromStorage(key, true);
         return list == null || list.isEmpty() ? null : list.remove(0);
     }
