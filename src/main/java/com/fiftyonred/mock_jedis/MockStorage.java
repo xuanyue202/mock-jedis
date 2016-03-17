@@ -3,6 +3,7 @@ package com.fiftyonred.mock_jedis;
 import com.fiftyonred.utils.WildcardMatcher;
 import redis.clients.jedis.Protocol;
 import redis.clients.jedis.SortingParams;
+import redis.clients.jedis.Tuple;
 import redis.clients.jedis.exceptions.JedisDataException;
 
 import java.util.*;
@@ -10,6 +11,32 @@ import java.util.*;
 import static com.fiftyonred.mock_jedis.DataContainer.CHARSET;
 
 public class MockStorage {
+
+	static class ScoredDataContainer {
+
+		final double score;
+		final DataContainer container;
+
+		ScoredDataContainer(double score, DataContainer container) {
+			this.score = score;
+			this.container = container;
+		}
+
+		public boolean equals(Object other) {
+			if (other != null && other instanceof ScoredDataContainer) {
+				ScoredDataContainer that = (ScoredDataContainer)other;
+
+				if (this.container.equals(that.container))
+					return true;
+			}
+
+			return false;
+		}
+
+		public int hashCode() {
+			return container.hashCode();
+		}
+	}
 
 	private static final int NUM_DBS = 16;
 	public static final long MILLISECONDS_IN_SECOND = 1000L;
@@ -20,6 +47,7 @@ public class MockStorage {
 	private final List<Map<DataContainer, Map<DataContainer, DataContainer>>> allHashStorage;
 	private final List<Map<DataContainer, List<DataContainer>>> allListStorage;
 	private final List<Map<DataContainer, Set<DataContainer>>> allSetStorage;
+	private final List<Map<DataContainer, Set<ScoredDataContainer>>> allSortedSetStorage;
 
 	private int currentDB;
 	private Map<DataContainer, KeyInformation> keys;
@@ -27,6 +55,7 @@ public class MockStorage {
 	private Map<DataContainer, Map<DataContainer, DataContainer>> hashStorage;
 	private Map<DataContainer, List<DataContainer>> listStorage;
 	private Map<DataContainer, Set<DataContainer>> setStorage;
+	private Map<DataContainer, Set<ScoredDataContainer>> sortedSetStorage;
 
 	public MockStorage() {
 		allKeys = new ArrayList<Map<DataContainer, KeyInformation>>(NUM_DBS);
@@ -34,12 +63,15 @@ public class MockStorage {
 		allHashStorage = new ArrayList<Map<DataContainer, Map<DataContainer, DataContainer>>>(NUM_DBS);
 		allListStorage = new ArrayList<Map<DataContainer, List<DataContainer>>>(NUM_DBS);
 		allSetStorage = new ArrayList<Map<DataContainer, Set<DataContainer>>>(NUM_DBS);
+		allSortedSetStorage = new ArrayList<Map<DataContainer, Set<ScoredDataContainer>>>(NUM_DBS);
+
 		for (int i = 0; i < NUM_DBS; ++i) {
 			allKeys.add(new HashMap<DataContainer, KeyInformation>());
 			allStorage.add(new HashMap<DataContainer, DataContainer>());
 			allHashStorage.add(new HashMap<DataContainer, Map<DataContainer, DataContainer>>());
 			allListStorage.add(new HashMap<DataContainer, List<DataContainer>>());
 			allSetStorage.add(new HashMap<DataContainer, Set<DataContainer>>());
+			allSortedSetStorage.add(new HashMap<DataContainer, Set<ScoredDataContainer>>());
 		}
 		select(0);
 	}
@@ -62,6 +94,8 @@ public class MockStorage {
 			allStorage.get(dbNum).clear();
 			allHashStorage.get(dbNum).clear();
 			allListStorage.get(dbNum).clear();
+			allSetStorage.get(dbNum).clear();
+			allSortedSetStorage.get(dbNum).clear();
 		}
 	}
 
@@ -70,6 +104,8 @@ public class MockStorage {
 		storage.clear();
 		hashStorage.clear();
 		listStorage.clear();
+		setStorage.clear();
+		sortedSetStorage.clear();
 	}
 
 	public synchronized void rename(final DataContainer oldkey, final DataContainer newkey) {
@@ -89,6 +125,10 @@ public class MockStorage {
 			case SET:
 				setStorage.put(newkey, setStorage.get(oldkey));
 				setStorage.remove(oldkey);
+				break;
+			case SORTED_SET:
+				sortedSetStorage.put(newkey, sortedSetStorage.get(oldkey));
+				sortedSetStorage.remove(oldkey);
 				break;
 			case STRING:
 			default:
@@ -191,6 +231,7 @@ public class MockStorage {
 		hashStorage = allHashStorage.get(dbIndex);
 		listStorage = allListStorage.get(dbIndex);
 		setStorage = allSetStorage.get(dbIndex);
+		sortedSetStorage = allSortedSetStorage.get(dbIndex);
 	}
 
 	public synchronized boolean pexpireAt(final DataContainer key, final long millisecondsTimestamp) {
@@ -722,6 +763,67 @@ public class MockStorage {
 			return null;
 		}
 		return setStorage.get(key);
+	}
+
+	protected Set<ScoredDataContainer> getSortedSetFromStorage(final DataContainer key, final boolean createIfNotExist) {
+		final KeyInformation info = keys.get(key);
+		if (info == null) {
+			if (createIfNotExist) {
+				createOrUpdateKey(key, KeyType.SORTED_SET, false);
+				final Set<ScoredDataContainer> result = new HashSet<ScoredDataContainer>();
+				sortedSetStorage.put(key, result);
+				return result;
+			}
+			return null; // no such key exists
+		}
+		if (info.getType() != KeyType.SORTED_SET) {
+			throw new JedisDataException("ERR Operation against a key holding the wrong kind of value");
+		}
+		if (info.isTTLSetAndKeyExpired()) {
+			sortedSetStorage.remove(key);
+			keys.remove(key);
+			return null;
+		}
+		return sortedSetStorage.get(key);
+	}
+
+	public synchronized long zadd(final DataContainer key, double score, final DataContainer member) {
+		final Set<ScoredDataContainer> map = getSortedSetFromStorage(key, true);
+
+		long added = 1L;
+
+        map.add(new ScoredDataContainer(score, member));
+
+		return added;
+	}
+
+	public synchronized long zrem(final DataContainer key, DataContainer... members) {
+		final Set<ScoredDataContainer> set = getSortedSetFromStorage(key, true);
+
+		long removed = 0L;
+
+		for (final DataContainer s : members) {
+			set.remove(new ScoredDataContainer(0, s));
+			removed++;
+		}
+
+		return removed;
+	}
+
+	public synchronized Set<DataContainer> zrangeByScore(DataContainer key, double min, double max) {
+		final Set<ScoredDataContainer> set = getSortedSetFromStorage(key, false);
+
+		Set<DataContainer> matches = new HashSet<DataContainer>();
+
+		if (set != null) {
+			for (ScoredDataContainer scored : set) {
+				if (scored.score >= min && scored.score <= max) {
+					matches.add(scored.container);
+				}
+			}
+		}
+
+		return matches;
 	}
 
 	public synchronized long sadd(final DataContainer key, final DataContainer... members) {

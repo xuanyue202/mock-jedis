@@ -1101,4 +1101,32 @@ public class MockTransaction extends Transaction {
         responses.add(resp);
         return resp;
     }
+
+    @Override
+    public Response<Long> zadd(String key, double score, String member) {
+        Response resp = pipeline.zadd(key, score, member);
+        responses.add(resp);
+        return resp;
+    }
+
+    @Override
+    public Response<Long> zadd(byte[] key, double score, byte[] member) {
+        Response resp = pipeline.zadd(key, score, member);
+        responses.add(resp);
+        return resp;
+    }
+
+    @Override
+    public Response<Long> zrem(byte[] key, byte[]... member) {
+        Response resp = pipeline.zrem(key, member);
+        responses.add(resp);
+        return resp;
+    }
+
+    @Override
+    public Response<Long> zrem(String key, String... member) {
+        Response resp = pipeline.zrem(key, member);
+        responses.add(resp);
+        return resp;
+    }
 }

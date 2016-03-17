@@ -831,7 +831,7 @@ public class MockJedis extends Jedis {
 	@Override
 	public String rpop(String key) {
         	return pipeline.rpop(key).get();
-    	}
+	}
 
 	@Override
 	public String rpoplpush(String srckey, String dstkey) {
@@ -845,7 +845,7 @@ public class MockJedis extends Jedis {
 
 	@Override
 	public Long zadd(String key, double score, String member) {
-		throw new UnsupportedOperationException(NOT_IMPLEMENTED);
+		return pipeline.zadd(key, score, member).get();
 	}
 
 	@Override
@@ -860,7 +860,7 @@ public class MockJedis extends Jedis {
 
 	@Override
 	public Long zrem(String key, String... members) {
-		throw new UnsupportedOperationException(NOT_IMPLEMENTED);
+		return pipeline.zrem(key, members).get();
 	}
 
 	@Override
@@ -950,7 +950,7 @@ public class MockJedis extends Jedis {
 
 	@Override
 	public Set<String> zrangeByScore(String key, double min, double max) {
-		throw new UnsupportedOperationException(NOT_IMPLEMENTED);
+		return pipeline.zrangeByScore(key, min, max).get();
 	}
 
 	@Override

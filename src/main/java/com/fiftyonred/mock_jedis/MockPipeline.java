@@ -1007,6 +1007,41 @@ public class MockPipeline extends Pipeline {
 	}
 
 	@Override
+	public Response<Long> zadd(final String key, double score, final String member) {
+		final Response<Long> response = new Response<Long>(BuilderFactory.LONG);
+		response.set(mockStorage.zadd(DataContainer.from(key), score, DataContainer.from(member)));
+		return response;
+	}
+
+	@Override
+	public Response<Long> zadd(byte[] key, double score, byte[] member) {
+		final Response<Long> response = new Response<Long>(BuilderFactory.LONG);
+		response.set(mockStorage.zadd(DataContainer.from(key), score, DataContainer.from(member)));
+		return response;
+	}
+
+	@Override
+	public Response<Long> zrem(String key, String... members) {
+		final Response<Long> response = new Response<Long>(BuilderFactory.LONG);
+		response.set(mockStorage.zrem(DataContainer.from(key), DataContainer.from(members)));
+		return response;
+	}
+
+	@Override
+	public Response<Long> zrem(byte[] key, byte[]... member) {
+		final Response<Long> response = new Response<Long>(BuilderFactory.LONG);
+		response.set(mockStorage.zrem(DataContainer.from(key), DataContainer.from(member)));
+		return response;
+	}
+
+	@Override
+	public Response<Set<String>> zrangeByScore(String key, double min, double max) {
+		final Response<Set<String>> response = new Response<Set<String>>(BuilderFactory.STRING_SET);
+		response.set(DataContainer.toBytes(mockStorage.zrangeByScore(DataContainer.from(key), min, max)));
+		return response;
+	}
+
+	@Override
 	public Response<Long> sadd(final String key, final String... member) {
 		final Response<Long> response = new Response<Long>(BuilderFactory.LONG);
 		response.set(mockStorage.sadd(DataContainer.from(key), DataContainer.from(member)));
