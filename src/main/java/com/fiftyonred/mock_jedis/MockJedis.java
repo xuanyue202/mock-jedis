@@ -844,18 +844,13 @@ public class MockJedis extends Jedis {
 	}
 
 	@Override
-	public Long zadd(String key, double score, String member) {
-		return pipeline.zadd(key, score, member).get();
-	}
-
-	@Override
 	public Long zadd(String key, Map<String, Double> scoreMembers) {
 		throw new UnsupportedOperationException(NOT_IMPLEMENTED);
 	}
 
 	@Override
-	public Set<String> zrange(String key, long start, long end) {
-		throw new UnsupportedOperationException(NOT_IMPLEMENTED);
+	public Long zadd(String key, double score, String member) {
+		return pipeline.zadd(key, score, member).get();
 	}
 
 	@Override
@@ -864,8 +859,18 @@ public class MockJedis extends Jedis {
 	}
 
 	@Override
+	public Long zcard(String key) {
+		return pipeline.zcard(key).get();
+	}
+
+	@Override
 	public Double zincrby(String key, double score, String member) {
 		throw new UnsupportedOperationException(NOT_IMPLEMENTED);
+	}
+
+	@Override
+	public Set<String> zrange(String key, long start, long end) {
+		return pipeline.zrange(key, start, end).get();
 	}
 
 	@Override
@@ -890,11 +895,6 @@ public class MockJedis extends Jedis {
 
 	@Override
 	public Set<Tuple> zrevrangeWithScores(String key, long start, long end) {
-		throw new UnsupportedOperationException(NOT_IMPLEMENTED);
-	}
-
-	@Override
-	public Long zcard(String key) {
 		throw new UnsupportedOperationException(NOT_IMPLEMENTED);
 	}
 

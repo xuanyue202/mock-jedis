@@ -790,6 +790,37 @@ public class MockStorage {
 		return sortedSetStorage.get(key);
 	}
 
+	static class ScoredDataContainerComparator implements Comparator<ScoredDataContainer> {
+		@Override
+		public boolean equals(Object obj) {
+			return obj == this;
+		}
+
+		@Override
+		public int compare(ScoredDataContainer o1, ScoredDataContainer o2) {
+			if (o1.score < o2.score)
+				return -1;
+
+			if (o1.score > o2.score)
+				return 1;
+
+			return 0;
+		}
+	}
+
+	private static ScoredDataContainerComparator scoreComparator = new ScoredDataContainerComparator();
+
+	private static List<ScoredDataContainer> sortScoredSet(Set<ScoredDataContainer> set) {
+		Iterator<ScoredDataContainer> it = set.iterator();
+		List<ScoredDataContainer> list = new ArrayList<>();
+		while (it.hasNext())
+			list.add(it.next());
+
+		list.sort(scoreComparator);
+
+		return list;
+	}
+
 	public synchronized long zadd(final DataContainer key, double score, final DataContainer member) {
 		final Set<ScoredDataContainer> map = getSortedSetFromStorage(key, true);
 
@@ -813,13 +844,40 @@ public class MockStorage {
 		return removed;
 	}
 
+	public synchronized long zcard(final DataContainer key) {
+		final Set<ScoredDataContainer> set = getSortedSetFromStorage(key, false);
+
+		return (set == null) ? 0 : set.size();
+	}
+
+	public synchronized Set<DataContainer> zrange(DataContainer key, long start, long end) {
+		final Set<ScoredDataContainer> set = getSortedSetFromStorage(key, false);
+
+		Set<DataContainer> matches = new HashSet<DataContainer>();
+
+		if (set != null) {
+			List<ScoredDataContainer> sorted = sortScoredSet(set);
+
+			start = (start < 0) ? sorted.size() + start : start;
+			end   = (end < 0)   ? sorted.size() + end   : end;
+
+			for (int i = (int)start; i <= end; i++) {
+			    matches.add(sorted.get(i).container);
+			}
+		}
+
+		return matches;
+	}
+
 	public synchronized Set<DataContainer> zrangeByScore(DataContainer key, double min, double max) {
 		final Set<ScoredDataContainer> set = getSortedSetFromStorage(key, false);
 
 		Set<DataContainer> matches = new HashSet<DataContainer>();
 
 		if (set != null) {
-			for (ScoredDataContainer scored : set) {
+			List<ScoredDataContainer> sorted = sortScoredSet(set);
+
+			for (ScoredDataContainer scored : sorted) {
 				if (scored.score >= min && scored.score <= max) {
 					matches.add(scored.container);
 				}

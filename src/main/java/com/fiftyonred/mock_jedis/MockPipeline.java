@@ -1035,6 +1035,20 @@ public class MockPipeline extends Pipeline {
 	}
 
 	@Override
+	public Response<Long> zcard(String key) {
+		final Response<Long> response = new Response<Long>(BuilderFactory.LONG);
+		response.set(mockStorage.zcard(DataContainer.from(key)));
+		return response;
+	}
+
+	@Override
+	public Response<Set<String>> zrange(String key, long start, long end) {
+		final Response<Set<String>> response = new Response<Set<String>>(BuilderFactory.STRING_SET);
+		response.set(DataContainer.toBytes(mockStorage.zrange(DataContainer.from(key), start, end)));
+		return response;
+	}
+
+	@Override
 	public Response<Set<String>> zrangeByScore(String key, double min, double max) {
 		final Response<Set<String>> response = new Response<Set<String>>(BuilderFactory.STRING_SET);
 		response.set(DataContainer.toBytes(mockStorage.zrangeByScore(DataContainer.from(key), min, max)));
