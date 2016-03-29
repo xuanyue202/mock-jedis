@@ -812,7 +812,7 @@ public class MockStorage {
 
 	private static List<ScoredDataContainer> sortScoredSet(Set<ScoredDataContainer> set) {
 		Iterator<ScoredDataContainer> it = set.iterator();
-		List<ScoredDataContainer> list = new ArrayList<>();
+		List<ScoredDataContainer> list = new ArrayList<ScoredDataContainer>();
 		while (it.hasNext())
 			list.add(it.next());
 
