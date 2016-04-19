@@ -1117,6 +1117,13 @@ public class MockTransaction extends Transaction {
     }
 
     @Override
+    public Response<Long> zadd(String key, Map<String, Double> scoreMembers) {
+        Response resp = pipeline.zadd(key, scoreMembers);
+        responses.add(resp);
+        return resp;
+    }
+
+    @Override
     public Response<Long> zrem(byte[] key, byte[]... member) {
         Response resp = pipeline.zrem(key, member);
         responses.add(resp);
@@ -1129,4 +1136,19 @@ public class MockTransaction extends Transaction {
         responses.add(resp);
         return resp;
     }
+
+    @Override
+    public Response<Long> zremrangeByScore(String key, double start, double end) {
+        Response resp = pipeline.zremrangeByScore(key, start, end);
+        responses.add(resp);
+        return resp;
+    }
+
+    @Override
+    public Response<Long> zremrangeByScore(byte[] key, double start, double end) {
+        Response resp = pipeline.zremrangeByScore(key, start, end);
+        responses.add(resp);
+        return resp;
+    }
+
 }

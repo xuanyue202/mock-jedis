@@ -1021,6 +1021,13 @@ public class MockPipeline extends Pipeline {
 	}
 
 	@Override
+	public Response<Long> zadd(String key, Map<String, Double> scoreMembers) {
+		final Response<Long> response = new Response<Long>(BuilderFactory.LONG);
+		response.set(mockStorage.zadd(key, scoreMembers));
+		return response;
+	}
+
+	@Override
 	public Response<Long> zrem(String key, String... members) {
 		final Response<Long> response = new Response<Long>(BuilderFactory.LONG);
 		response.set(mockStorage.zrem(DataContainer.from(key), DataContainer.from(members)));
@@ -1031,6 +1038,20 @@ public class MockPipeline extends Pipeline {
 	public Response<Long> zrem(byte[] key, byte[]... member) {
 		final Response<Long> response = new Response<Long>(BuilderFactory.LONG);
 		response.set(mockStorage.zrem(DataContainer.from(key), DataContainer.from(member)));
+		return response;
+	}
+
+	@Override
+	public Response<Long> zremrangeByScore(String key, double start, double end) {
+		final Response<Long> response = new Response<Long>(BuilderFactory.LONG);
+		response.set(mockStorage.zremrangeByScore(DataContainer.from(key), start, end));
+		return response;
+	}
+
+	@Override
+	public Response<Long> zremrangeByScore(byte[] key, double start, double end) {
+		final Response<Long> response = new Response<Long>(BuilderFactory.LONG);
+		response.set(mockStorage.zremrangeByScore(DataContainer.from(key), start, end));
 		return response;
 	}
 

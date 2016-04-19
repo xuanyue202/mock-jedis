@@ -824,11 +824,24 @@ public class MockStorage {
 	public synchronized long zadd(final DataContainer key, double score, final DataContainer member) {
 		final Set<ScoredDataContainer> map = getSortedSetFromStorage(key, true);
 
-		long added = 1L;
+		long added = 0L;
 
-        map.add(new ScoredDataContainer(score, member));
+        if (map.add(new ScoredDataContainer(score, member))) {
+			added += 1;
+		}
 
 		return added;
+	}
+
+	public synchronized long zadd(final String key, Map<String, Double> scoreMembers) {
+
+		long ret = 0L;
+
+		for (Map.Entry<String, Double> entry : scoreMembers.entrySet()) {
+			ret += zadd(DataContainer.from(key), entry.getValue(), DataContainer.from(entry.getKey()));
+		}
+
+		return ret;
 	}
 
 	public synchronized long zrem(final DataContainer key, DataContainer... members) {
@@ -842,6 +855,26 @@ public class MockStorage {
 		}
 
 		return removed;
+	}
+
+    public synchronized long zremrangeByScore(final DataContainer key, double start, double end) {
+		final Set<ScoredDataContainer> set = getSortedSetFromStorage(key, false);
+
+		if (set == null)
+			return 0;
+
+
+		Set<ScoredDataContainer> removals = new HashSet<ScoredDataContainer>();
+
+		for (ScoredDataContainer sdc : set) {
+			if (sdc.score >= start && sdc.score <= end)
+				removals.add(sdc);
+		}
+
+		for (ScoredDataContainer rem: removals)
+			set.remove(rem);
+
+		return removals.size();
 	}
 
 	public synchronized long zcard(final DataContainer key) {

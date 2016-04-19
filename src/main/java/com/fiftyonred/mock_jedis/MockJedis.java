@@ -845,7 +845,7 @@ public class MockJedis extends Jedis {
 
 	@Override
 	public Long zadd(String key, Map<String, Double> scoreMembers) {
-		throw new UnsupportedOperationException(NOT_IMPLEMENTED);
+		return pipeline.zadd(key, scoreMembers).get();
 	}
 
 	@Override
@@ -856,6 +856,11 @@ public class MockJedis extends Jedis {
 	@Override
 	public Long zrem(String key, String... members) {
 		return pipeline.zrem(key, members).get();
+	}
+
+	@Override
+	public Long zremrangeByScore(String key, double start, double end) {
+		return pipeline.zremrangeByScore(key, start, end).get();
 	}
 
 	@Override
@@ -1036,11 +1041,6 @@ public class MockJedis extends Jedis {
 
 	@Override
 	public Long zremrangeByRank(String key, long start, long end) {
-		throw new UnsupportedOperationException(NOT_IMPLEMENTED);
-	}
-
-	@Override
-	public Long zremrangeByScore(String key, double start, double end) {
 		throw new UnsupportedOperationException(NOT_IMPLEMENTED);
 	}
 
