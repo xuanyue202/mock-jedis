@@ -859,10 +859,29 @@ public class MockStorage {
 			List<ScoredDataContainer> sorted = sortScoredSet(set);
 
 			start = (start < 0) ? sorted.size() + start : start;
-			end   = (end < 0)   ? sorted.size() + end   : end;
+			end   = (end < 0)   ? sorted.size() + end   : Math.min(sorted.size() - 1, end);
 
 			for (int i = (int)start; i <= end; i++) {
 			    matches.add(sorted.get(i).container);
+			}
+		}
+
+		return matches;
+	}
+
+	public synchronized Set<Tuple> zrangeWithScores(DataContainer key, long start, long end) {
+		final Set<ScoredDataContainer> set = getSortedSetFromStorage(key, false);
+
+		Set<Tuple> matches = new HashSet<Tuple>();
+
+		if (set != null) {
+			List<ScoredDataContainer> sorted = sortScoredSet(set);
+
+			start = (start < 0) ? sorted.size() + start : start;
+			end   = (end < 0)   ? sorted.size() + end   : end;
+
+			for (int i = (int)start; i <= end; i++) {
+			    matches.add(new Tuple(sorted.get(i).container.getString(), sorted.get(i).score));
 			}
 		}
 

@@ -888,10 +888,6 @@ public class MockJedis extends Jedis {
 		throw new UnsupportedOperationException(NOT_IMPLEMENTED);
 	}
 
-	@Override
-	public Set<Tuple> zrangeWithScores(String key, long start, long end) {
-		throw new UnsupportedOperationException(NOT_IMPLEMENTED);
-	}
 
 	@Override
 	public Set<Tuple> zrevrangeWithScores(String key, long start, long end) {
@@ -951,6 +947,16 @@ public class MockJedis extends Jedis {
 	@Override
 	public Set<String> zrangeByScore(String key, double min, double max) {
 		return pipeline.zrangeByScore(key, min, max).get();
+	}
+
+	@Override
+	public Set<Tuple> zrangeWithScores(String key, long start, long end) {
+		return pipeline.zrangeWithScores(key, start, end).get();
+	}
+
+	@Override
+	public Set<Tuple> zrangeWithScores(byte[] key, long start, long end) {
+		return pipeline.zrangeWithScores(key, start, end).get();
 	}
 
 	@Override
@@ -1593,10 +1599,6 @@ public class MockJedis extends Jedis {
 		throw new UnsupportedOperationException(NOT_IMPLEMENTED);
 	}
 
-	@Override
-	public Set<Tuple> zrangeWithScores(byte[] key, long start, long end) {
-		throw new UnsupportedOperationException(NOT_IMPLEMENTED);
-	}
 
 	@Override
 	public Set<Tuple> zrevrangeWithScores(byte[] key, long start, long end) {
