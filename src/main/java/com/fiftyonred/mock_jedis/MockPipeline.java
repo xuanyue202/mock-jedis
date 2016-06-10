@@ -988,6 +988,22 @@ public class MockPipeline extends Pipeline {
 	}
 
 	@Override
+	public Response<String> ltrim(byte[] key, long start, long end) {
+		final Response<String> response = new Response<String>(BuilderFactory.STRING);
+		mockStorage.ltrim(DataContainer.from(key), start, end);
+		response.set(OK_RESPONSE);
+		return response;
+	}
+
+	@Override
+	public Response<String> ltrim(String key, long start, long end) {
+		final Response<String> response = new Response<String>(BuilderFactory.STRING);
+		mockStorage.ltrim(DataContainer.from(key), start, end);
+		response.set(OK_RESPONSE);
+		return response;
+	}
+
+	@Override
 	public void sync() {
 		// do nothing
 	}

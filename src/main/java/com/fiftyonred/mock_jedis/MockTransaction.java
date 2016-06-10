@@ -1096,6 +1096,20 @@ public class MockTransaction extends Transaction {
     }
 
     @Override
+    public Response<String> ltrim(byte[] key, long start, long end) {
+        Response resp = pipeline.ltrim(key, start, end);
+        responses.add(resp);
+        return resp;
+    }
+
+    @Override
+    public Response<String> ltrim(String key, long start, long end) {
+        Response resp = pipeline.ltrim(key, start, end);
+        responses.add(resp);
+        return resp;
+    }
+
+    @Override
     public Response<Set<String>> keys(final String pattern) {
         Response resp = pipeline.keys(pattern);
         responses.add(resp);

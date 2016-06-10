@@ -653,6 +653,21 @@ public class MockStorage {
 		return result;
 	}
 
+	public synchronized void ltrim(final DataContainer key, long start, long end) {
+		final List<DataContainer> full = getListFromStorage(key, false);
+
+		if (full != null) {
+
+			start = (start < 0) ? full.size() + start : start;
+			end   = (end < 0)   ? full.size() + end   : Math.min(full.size() - 1, end);
+
+			if (start > end)
+				listStorage.remove(key);
+			else
+				listStorage.put(key, full.subList((int)start, (int)end));
+		}
+	}
+
 	public Set<DataContainer> keys(final DataContainer pattern) {
 		final Set<DataContainer> result = new HashSet<DataContainer>();
 		for (final DataContainer key : keys.keySet()) {

@@ -7,7 +7,7 @@ project.ext {
 }
 
 group = 'com.centricient'
-version = '0.1.6'
+version = '0.1.7'
 
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
@@ -42,19 +42,17 @@ artifacts {
 }
 
 //noinspection GroovyMissingReturnStatement
-if (rootProject.properties['nexusUser']) {
     uploadArchives {
         repositories {
             mavenDeployer {
                 repository(url: "http://nexus.centricient.corp:8081/nexus/content/repositories/releases/") {
-                    authentication(userName: nexusUser, password: nexusPassword)
+                    authentication(userName: 'deployment', password: 'c8c4ii2WJkTmp88F9njZG2j7At6E4D')
                 }
                 pom.version = version
                 pom.artifactId = rootProject.name
             }
         }
     }
-}
 
 task projectVersion << {
     println version
