@@ -954,6 +954,36 @@ public class MockStorage {
 		return matches;
 	}
 
+	public synchronized Long zrank(DataContainer key, DataContainer member) {
+		final Set<ScoredDataContainer> set = getSortedSetFromStorage(key, false);
+
+	    if (set != null) {
+			List<ScoredDataContainer> sorted = sortScoredSet(set);
+			long rank = 0;
+			for (ScoredDataContainer scored: sorted) {
+				if (scored.container.equals(member)) {
+					return rank;
+				}
+				rank++;
+			}
+		}
+
+		return null;
+	}
+
+	public synchronized DataContainer zscore(DataContainer key, DataContainer member) {
+        final Set<ScoredDataContainer> set = getSortedSetFromStorage(key, false);
+
+	    if (set != null) {
+			for (ScoredDataContainer scored: set) {
+				if (scored.container.equals(member)) {
+					return DataContainer.from(Double.toString(scored.score));
+				}
+			}
+		}
+		return null;
+	}
+
 	public synchronized long sadd(final DataContainer key, final DataContainer... members) {
 		final Set<DataContainer> set = getSetFromStorage(key, true);
 

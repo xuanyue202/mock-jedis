@@ -1107,6 +1107,36 @@ public class MockPipeline extends Pipeline {
 	}
 
 	@Override
+	public Response<Long> zrank(byte[] key, byte[] member) {
+		final Response<Long> response = new Response<Long>(BuilderFactory.LONG);
+		response.set(mockStorage.zrank(DataContainer.from(key), DataContainer.from(member)));
+		return response;
+	}
+
+	@Override
+	public Response<Long> zrank(String key, String member) {
+		final Response<Long> response = new Response<Long>(BuilderFactory.LONG);
+		response.set(mockStorage.zrank(DataContainer.from(key), DataContainer.from(member)));
+		return response;
+	}
+
+	@Override
+	public Response<Double> zscore(byte[] key, byte[] member) {
+		final Response<Double> response = new Response<Double>(BuilderFactory.DOUBLE);
+		response.set(mockStorage.zscore(DataContainer.from(key), DataContainer.from(member)).getBytes());
+		return response;
+	}
+
+	@Override
+	public Response<Double> zscore(String key, String member) {
+
+		final Response<Double> response = new Response<Double>(BuilderFactory.DOUBLE);
+		DataContainer result = mockStorage.zscore(DataContainer.from(key), DataContainer.from(member));
+		response.set((result == null) ? null : result.getBytes());
+		return response;
+	}
+
+	@Override
 	public Response<Long> sadd(final String key, final String... member) {
 		final Response<Long> response = new Response<Long>(BuilderFactory.LONG);
 		response.set(mockStorage.sadd(DataContainer.from(key), DataContainer.from(member)));
