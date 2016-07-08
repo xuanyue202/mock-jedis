@@ -658,8 +658,8 @@ public class MockStorage {
 
 		if (full != null) {
 
-			start = (start < 0) ? full.size() + start : start;
-			end   = (end < 0)   ? full.size() + end   : Math.min(full.size() - 1, end);
+			start = (start < 0) ? full.size() + start   : start;
+			end   = (end < 0)   ? full.size() + end + 1 : Math.min(full.size(), end);
 
 			if (start > end)
 				listStorage.remove(key);
