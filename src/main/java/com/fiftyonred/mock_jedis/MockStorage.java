@@ -901,7 +901,7 @@ public class MockStorage {
 	public synchronized Set<DataContainer> zrange(DataContainer key, long start, long end) {
 		final Set<ScoredDataContainer> set = getSortedSetFromStorage(key, false);
 
-		Set<DataContainer> matches = new HashSet<DataContainer>();
+		Set<DataContainer> matches = new LinkedHashSet<DataContainer>();
 
 		if (set != null) {
 			List<ScoredDataContainer> sorted = sortScoredSet(set);
