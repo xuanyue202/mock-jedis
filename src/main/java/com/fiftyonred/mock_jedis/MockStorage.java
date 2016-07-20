@@ -920,7 +920,7 @@ public class MockStorage {
 	public synchronized Set<Tuple> zrangeWithScores(DataContainer key, long start, long end) {
 		final Set<ScoredDataContainer> set = getSortedSetFromStorage(key, false);
 
-		Set<Tuple> matches = new HashSet<Tuple>();
+		Set<Tuple> matches = new LinkedHashSet<Tuple>();
 
 		if (set != null) {
 			List<ScoredDataContainer> sorted = sortScoredSet(set);
@@ -939,7 +939,7 @@ public class MockStorage {
 	public synchronized Set<DataContainer> zrangeByScore(DataContainer key, double min, double max) {
 		final Set<ScoredDataContainer> set = getSortedSetFromStorage(key, false);
 
-		Set<DataContainer> matches = new HashSet<DataContainer>();
+		Set<DataContainer> matches = new LinkedHashSet<DataContainer>();
 
 		if (set != null) {
 			List<ScoredDataContainer> sorted = sortScoredSet(set);
