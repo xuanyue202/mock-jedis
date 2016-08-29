@@ -5,6 +5,17 @@ It's useful for testing your code without actually having a live redis server up
 Currently, mock-jedis supports pipelining and all the basic Jedis commands, but if you find missing 
 functionality you're welcome to submit a pull request.
 
+## What's different
+
+This repo enhance the original one (50onRed) with a more complete list operation support (LPOP LPUSH RPUSH RPOP).
+
+In addition, this repo uses its own maven central url for the new features.
+```gradle
+dependencies {
+  testCompile 'com.github.xuanyue202:mock-jedis:0.4.1'
+}
+```
+
 ## Compile
 with gradle (preferred method):
 ```shell
@@ -15,7 +26,7 @@ gradle build
 
 Add it as a dependency to your project.
 
-Here's a sample gradle script that will pull mock-jedis 0.4.0 from maven-central
+Here's a sample gradle script that will pull mock-jedis 0.4.1 from maven-central
 ```gradle
 buildscript {
     repositories {
@@ -26,7 +37,7 @@ buildscript {
 apply plugin: 'java'
 
 dependencies {
-  testCompile 'com.fiftyonred:mock-jedis:0.4.0'
+  testCompile 'com.github.xuanyue202:mock-jedis:0.4.1'
 }
 ```
 
